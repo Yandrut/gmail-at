@@ -1,18 +1,15 @@
 package org.yandrut.gmail_at.pages;
 
-import static org.yandrut.gmail_at.drivers.DriverWaiter.waitForJSComplete;
-
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.PageFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import org.openqa.selenium.support.PageFactory;
 import org.yandrut.gmail_at.drivers.DriverWaiter;
 
 @Lazy
@@ -42,14 +39,6 @@ public abstract class AbstractPage {
         }
     }
 
-    public void clickByJs(WebElement element, String logInfo) {
-        DriverWaiter.waitForElementToBeVisible(element);
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        log.info("Clicking by JS on: {} ", logInfo);
-        js.executeScript("arguments[0].click();", element);
-    }
-
-
     public void sendKeys(WebElement element, String sequence) {
         DriverWaiter.waitForElementToBeVisible(element);
         log.info("Sending key sequence: {}", sequence);
@@ -76,16 +65,6 @@ public abstract class AbstractPage {
 
     public WebElement findElementByXpath(String xpath) {
         return driver.findElement(By.xpath(xpath));
-    }
-
-    public void waitForAttributeToBe(WebElement element, String attribute, String expectedValue) {
-        DriverWaiter.waitForAttributeToBe(element, attribute, expectedValue);
-    }
-
-    public void refreshPage() {
-        waitForJSComplete();
-        driver.navigate().refresh();
-        waitForJSComplete();
     }
 
     public String[] splitStringIntoSeparateWords(String string) {
