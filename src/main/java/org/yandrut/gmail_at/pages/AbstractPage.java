@@ -6,8 +6,8 @@ import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -31,13 +31,13 @@ public abstract class AbstractPage {
     public void click(WebElement element, String logInfo) {
         DriverWaiter.waitForElementToBeVisible(element);
         DriverWaiter.waitForElementToBeClickable(element);
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 10; i++) {
             try {
-                log.info("Clicking on: {} ", logInfo);
+                log.info("Trying to click on: {} ", logInfo);
                 element.click();
                 break;
-            } catch (StaleElementReferenceException e) {
-                log.debug("Click failed, trying again. Message: {}", e.getMessage());
+            } catch (WebDriverException e) {
+                log.debug("Error occurred when attempting to click: {}", e.getMessage());
             }
         }
     }
@@ -53,7 +53,14 @@ public abstract class AbstractPage {
     public void sendKeys(WebElement element, String sequence) {
         DriverWaiter.waitForElementToBeVisible(element);
         log.info("Sending key sequence: {}", sequence);
-        element.sendKeys(sequence);
+        for (int i = 0; i < 5; i++) {
+            try {
+                element.sendKeys(sequence);
+                break;
+            } catch (WebDriverException e) {
+                log.debug("Error occurred when attempting to send keys: {}", e.getMessage());
+            }
+        }
     }
 
     public String getText(WebElement element) {

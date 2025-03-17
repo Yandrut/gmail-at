@@ -8,11 +8,14 @@ import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.stereotype.Component;
 
+@Component
 @Slf4j
 public class DriverWaiter {
     public static final Duration VISIBILITY_TIMEOUT = Duration.ofSeconds(10L);
     private static final WebDriverWait wait = new WebDriverWait(DriverProvider.getDriver(), VISIBILITY_TIMEOUT);
+
     public static void waitForElementToBeClickable(WebElement element) {
         log.debug("Waiting for element to be clickable");
         wait.until(ExpectedConditions.elementToBeClickable(element));

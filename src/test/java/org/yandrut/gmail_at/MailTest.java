@@ -1,6 +1,8 @@
 package org.yandrut.gmail_at;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -26,7 +28,8 @@ public class MailTest extends BaseTest {
     @MethodSource(value = "mailData")
     @ParameterizedTest
     public void allowsToCreateNewMailAsDraft(String address, String subject, String body) {
-        mailServicePage.clickOnWriteNewMail().createNewEmail(address, subject, body);
+        mailServicePage.clickOnWriteNewMail();
+        modalWindow.createNewEmail(address, subject, body);
         mailServicePage.openDraftsFolder();
         draftsPage.clickToTheDraftWith(subject);
         String draftEmailInfo = modalWindow.getDraftEmailInfo();
@@ -41,9 +44,11 @@ public class MailTest extends BaseTest {
     @ParameterizedTest
     public void isMailPresentInTheSentPage(String subject) {
         mailServicePage.openDraftsFolder();
+        assertTrue(draftsPage.isDraftPageOpen());
         draftsPage.clickToTheDraftWith(subject);
         modalWindow.clickOnSendMail();
         modalWindow.navigateToSentPageLink();
+        assertTrue(sentMailsPage.isSentPageOpen());
 
         boolean isMailPresentInTheSentPage = sentMailsPage.isEmailWithSubjectPresent(subject);
         assertThat(isMailPresentInTheSentPage)
@@ -56,7 +61,6 @@ public class MailTest extends BaseTest {
     @Test
     public void isMailPresentInTheInboxPage() {
         String subject = "Please help, Im a bot";
-
         boolean isMailPresent = mailServicePage.isMailWithSubjectPresent(subject);
         assertThat(isMailPresent)
             .as("Mail with a: " + subject + "subject should be present in the inbox page")
@@ -68,16 +72,15 @@ public class MailTest extends BaseTest {
             {
                 {"mykola_koltutskyi@epam.com", "This is a test mail", "Just playing around"},
                 {"nickolayko@yahoo.com", "Super important", "Write me back, buddy. Cheers!"},
-                {"seleniumpilot@gmail.com", "Please help, Im a bot", "It is hard to get out of this server"}
+                {"seleniumpilot@gmail.com", "Please help, I'm a bot", "It is hard to get out of this server"}
             };
     }
 
-    public static Object[][] mailSubjects() {
-        return new Object[][]
-            {
-                {"This is a test mail"},
-                {"Super important"},
-                {"Please help, Im a bot"}
-            };
-    }
+    public static Object[][] mailSubjects () {
+        return new Object[][] {
+                    {"This is a test mail"},
+                    {"Super important"},
+                    {"Please help, I'm a bot"}
+                };
+        }
 }

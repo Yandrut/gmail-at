@@ -20,6 +20,9 @@ public class DraftsPage extends AbstractPage {
     @FindBy(xpath = "//a[contains(@href, '#sent')]")
     private WebElement sentPageLink;
 
+    @FindBy(css = "[translate='no']")
+    private WebElement draftsLabel;
+
     private static final String BLANK_LOCATOR_FOR_TEXT = "//*[@class='bog']/*[contains(text(), '%s')]";
 
     public DraftsPage() {
@@ -35,16 +38,7 @@ public class DraftsPage extends AbstractPage {
         click(draftLink, String.format("the draft: '%s'", draftSubject));
     }
 
-    public void cleanAllDrafts() {
-       click(selectAllDrafts, "Select checkbox to delete all drafts");
-       waitForAttributeToBe(selectAllDrafts, "aria-checked", "true");
-       click(deleteSelectedDraftsButton, "Click on delete all selected drafts");
-    }
-
-    public SentMailsPage cleanAllSentMails() {
-        click(sentPageLink, "Click to sent emails page");
-        waitForAttributeToBe(selectAllDrafts, "aria-checked", "true");
-        click(deleteSelectedDraftsButton, "Click on delete all selected drafts");
-        return new SentMailsPage();
+    public boolean isDraftPageOpen() {
+        return isElementPresent(draftsLabel, "Any draft label");
     }
 }

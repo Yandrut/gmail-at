@@ -11,26 +11,30 @@ import org.springframework.stereotype.Component;
 @Component
 public class MailModalWindow extends AbstractPage {
 
-    @FindBy(xpath = "//div[@role='presentation']/input[1]")
+    @FindBy(xpath = "//div[@aria-multiselectable='true']/div/input[@role='combobox']")
     private WebElement addressInput;
 
     @FindBy(xpath = "//input[@spellcheck='true']")
     private WebElement subjectInput;
 
-    @FindBy(xpath = "//table[@cellpadding='0']/tbody/tr/td/div/h2/div/following::div/span")
-    private WebElement subjectLabel;
-
     @FindBy(css = "[g_editable='true']")
     private WebElement emailBodyInput;
 
-    @FindBy(xpath = "//td/img[3]")
+    @FindBy(xpath = "//*[contains(@data-tooltip, 'Shift')]/following-sibling::img")
     private WebElement quitEditing;
 
-    @FindBy(xpath = "//div[contains(@aria-label, 'Enter')]")
+    @FindBy(xpath = "//*[contains(@aria-label, 'Enter')]")
     private WebElement submitMail;
 
-    @FindBy(xpath = "//*[contains(@href, '#sent')]")
+    @FindBy(xpath = "//img[contains(@aria-label, 'Shift')]/../..//span")
+    private WebElement subjectLabel;
+
+    @FindBy(xpath = "//*[contains(@*, '#sent')]")
     private WebElement sentPageLink;
+
+    public MailModalWindow() {
+        super();
+    }
 
     public void createNewEmail(String address, String subject, String body) {
         sendKeys(addressInput, address);
@@ -45,7 +49,9 @@ public class MailModalWindow extends AbstractPage {
     }
 
     public void navigateToSentPageLink() {
+        waitForJSComplete();
         click(sentPageLink, "Sent mails page link");
+        waitForJSComplete();
     }
 
     public String getDraftEmailInfo() {

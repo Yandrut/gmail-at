@@ -53,9 +53,8 @@ public class HomePage extends AbstractPage {
         return isElementPresent(gmailLogo, "Gmail logo on the mail page");
     }
 
-    public MailModalWindow clickOnWriteNewMail() {
+    public void clickOnWriteNewMail() {
         click(writeNewMail, "Write new mail button");
-        return new MailModalWindow();
     }
 
     public void openDraftsFolder() {
@@ -71,16 +70,5 @@ public class HomePage extends AbstractPage {
                         .filter((element) -> element.getText().equals(mailSubject))
                         .findAny()
                         .orElseThrow(() -> new ElementNotPresentException("Element is not present on the page"));
-    }
-
-    public long getAllInboxEmailsCount() {
-        return inboxMail.stream()
-                        .map(WebElement::getText)
-                        .filter(s -> !s.isEmpty())
-                        .count();
-    }
-
-    public void deleteAllMails() {
-
     }
 }
