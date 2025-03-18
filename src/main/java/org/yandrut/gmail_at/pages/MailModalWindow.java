@@ -2,13 +2,10 @@ package org.yandrut.gmail_at.pages;
 
 import static org.yandrut.gmail_at.drivers.DriverWaiter.waitForJSComplete;
 
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
-@Lazy
-@Component
 public class MailModalWindow extends AbstractPage {
 
     @FindBy(xpath = "//div[@aria-multiselectable='true']/div/input[@role='combobox']")
@@ -32,8 +29,8 @@ public class MailModalWindow extends AbstractPage {
     @FindBy(xpath = "//*[contains(@*, '#sent')]")
     private WebElement sentPageLink;
 
-    public MailModalWindow() {
-        super();
+    public MailModalWindow(WebDriver driver) {
+        super(driver);
     }
 
     public void createNewEmail(String address, String subject, String body) {

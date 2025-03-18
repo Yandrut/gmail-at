@@ -1,12 +1,9 @@
 package org.yandrut.gmail_at.pages;
 
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
-@Lazy
-@Component
 public class SentMailsPage extends AbstractPage {
 
     @FindBy(xpath = "//a[@href='#inbox']")
@@ -17,8 +14,8 @@ public class SentMailsPage extends AbstractPage {
 
     private static final String BLANK_LOCATOR_FOR_TEXT = "//*[@class='bog']/*[contains(text(), '%s')]";
 
-    public SentMailsPage() {
-        super();
+    public SentMailsPage(WebDriver driver) {
+        super(driver);
     }
 
     public boolean isEmailWithSubjectPresent(String emailSubject) {
