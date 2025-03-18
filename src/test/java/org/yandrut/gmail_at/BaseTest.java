@@ -14,9 +14,8 @@ import org.yandrut.gmail_at.pages.SentMailsPage;
 public class BaseTest {
 
     String BASE_URL = DataReader.getData("test.url");
-
-    String EMAIL = "";
-    String PASSWORD = "";
+    String EMAIL = System.getenv("AT_GOOGLE_MAIL");
+    String PASSWORD = System.getenv("AT_GOOGLE_PASSWORD");
 
     HomePage homePage;
     MailModalWindow modalWindow;
