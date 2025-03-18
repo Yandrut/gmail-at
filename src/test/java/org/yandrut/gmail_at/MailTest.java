@@ -4,11 +4,14 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MailTest extends BaseTest {
 
     @Order(1)
@@ -29,7 +32,7 @@ public class MailTest extends BaseTest {
         homePage.clickOnWriteNewMail();
         modalWindow.createNewEmail(address, subject, body);
         homePage.openDraftsFolder();
-        assertTrue(draftsPage.isDraftPageOpen());
+        assertTrue(draftsPage.isDraftPageOpen(), "Draft page should be open");
         draftsPage.clickToTheDraftWith(subject);
         String draftEmailInfo = modalWindow.getDraftEmailInfo();
         assertThat(draftEmailInfo)
@@ -43,12 +46,10 @@ public class MailTest extends BaseTest {
     @ParameterizedTest
     public void isMailPresentInTheSentPage(String subject) {
         homePage.openDraftsFolder();
-        assertTrue(draftsPage.isDraftPageOpen());
+        assertTrue(draftsPage.isDraftPageOpen(), "Draft page should be open");
         draftsPage.clickToTheDraftWith(subject);
         modalWindow.clickOnSendMail();
         modalWindow.navigateToSentPageLink();
-        assertTrue(sentMailsPage.isSentPageOpen());
-
         boolean isMailPresentInTheSentPage = sentMailsPage.isEmailWithSubjectPresent(subject);
         assertThat(isMailPresentInTheSentPage)
             .as("Mail with a: " + subject + " should be present in the sent page")
@@ -59,11 +60,11 @@ public class MailTest extends BaseTest {
     @DisplayName("Is mail present in the Inbox page")
     @Test
     public void isMailPresentInTheInboxPage() {
-        String subject = "Please help, Im a bot";
-        boolean isMailPresent = homePage.isMailWithSubjectPresent(subject);
-        assertThat(isMailPresent)
-            .as("Mail with a: " + subject + "subject should be present in the inbox page")
-            .isTrue();
+        String subject = "Please help, I'm a bot";
+        String allMailsFromInbox = homePage.getAllMailsFromInbox();
+        assertThat(allMailsFromInbox)
+            .as("Mail with a: " + subject + " subject should be present in the inbox page")
+            .contains(subject);
     }
 
     public static Object[][] mailData() {

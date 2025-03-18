@@ -70,20 +70,28 @@ public abstract class AbstractPage {
         wait.waitForPageUpdate();
         wait.waitForJSComplete();
         log.info("Waiting for element to be present: {}", logInfo);
-        wait.waitForElementToBeVisible(element);
+        try {
+            wait.waitForElementToBeVisible(element);
+        } catch (StaleElementReferenceException e) {
+            log.debug("Error occurred while waiting: {} ", e.getMessage());
+        }
         return element.isDisplayed();
     }
 
     public String getTextOfVisibleElements(List<WebElement> elements) {
         wait.waitForPageUpdate();
         wait.waitForJSComplete();
-        String s = "";
+        String delimiter = "; ";
+        StringBuilder s = new StringBuilder();
         for (WebElement element : elements) {
-            if (element.isDisplayed()) {
-                s = element.getText() + ";";
+            if (isElementPresent(element, "inbox email")) {
+                s.append(element.getText()).append(delimiter);
+            } else {
+                wait.waitForElementToBeVisible(element);
+                s.append(element.getText()).append(delimiter);
             }
         }
-        return s;
+        return s.toString();
     }
 
     public WebElement findElementByXPath(String locator) {

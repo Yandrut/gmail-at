@@ -1,6 +1,8 @@
 package org.yandrut.gmail_at.pages;
 
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -20,6 +22,7 @@ public class DraftsPage extends AbstractPage {
     private List<WebElement> drafts;
 
     private static final String BLANK_LOCATOR_FOR_TEXT = "//*[@class='bog']/*[contains(text(), '%s')]";
+    private static final Logger log = LogManager.getLogger(DraftsPage.class);
 
     public DraftsPage(WebDriver driver) {
         super(driver);
@@ -36,6 +39,7 @@ public class DraftsPage extends AbstractPage {
 
     public boolean isDraftPageOpen() {
         String draftsText = getTextOfVisibleElements(drafts);
+        log.debug(draftsText);
         return draftsText.contains("Чернетка") || draftsText.contains("Draft");
 
     }

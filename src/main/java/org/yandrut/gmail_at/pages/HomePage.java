@@ -1,10 +1,11 @@
 package org.yandrut.gmail_at.pages;
 
 import java.util.List;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.yandrut.gmail_at.exception.ElementNotPresentException;
 import org.yandrut.gmail_at.model.User;
 
 public class HomePage extends AbstractPage {
@@ -24,13 +25,13 @@ public class HomePage extends AbstractPage {
     @FindBy(xpath = "//img[contains(@src, 'logo_gmail_lockup')]")
     private WebElement gmailLogo;
 
-    @FindBy(xpath = "//*[contains(@href, 'draft')]")
-    private WebElement draftFolderLink;
+    private static final Logger log = LogManager.getLogger(HomePage.class);
 
     @FindBy(xpath = "//div[@role='navigation']//div[@role='button']")
     private WebElement writeNewMail;
-
-    @FindBy(xpath = "//tr[@draggable='false']")
+    @FindBy(xpath = "//*[contains(@href, '#draft')]")
+    private WebElement draftFolderLink;
+    @FindBy(xpath = "//*[@class='bog']/span")
     private List<WebElement> inboxMail;
 
     public HomePage(WebDriver driver) {
@@ -56,14 +57,9 @@ public class HomePage extends AbstractPage {
         click(draftFolderLink, "Draft folder link");
     }
 
-    public boolean isMailWithSubjectPresent(String mailSubject) {
-        return findMailWithSubject(mailSubject).getText().equals(mailSubject);
-    }
-
-    public WebElement findMailWithSubject(String mailSubject) {
-        return inboxMail.stream()
-                        .filter((element) -> element.getText().equals(mailSubject))
-                        .findAny()
-                        .orElseThrow(() -> new ElementNotPresentException("Element is not present on the page"));
+    public String getAllMailsFromInbox() {
+        String visibleMails = getTextOfVisibleElements(inboxMail);
+        log.debug("Mails found on the page: {}", visibleMails);
+        return visibleMails;
     }
 }
