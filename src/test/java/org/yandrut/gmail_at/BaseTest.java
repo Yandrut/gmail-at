@@ -15,8 +15,8 @@ public class BaseTest {
 
     String BASE_URL = DataReader.getData("test.url");
 
-    String EMAIL = "";
-    String PASSWORD = "";
+    String EMAIL = "seleniumpilot@gmail.com";
+    String PASSWORD = "pfJD~$d8n#qJcdV";
 
     HomePage homePage;
     MailModalWindow modalWindow;

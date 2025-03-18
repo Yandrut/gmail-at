@@ -1,10 +1,9 @@
 package org.yandrut.gmail_at.pages;
 
-import org.openqa.selenium.By;
+import java.util.List;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.yandrut.gmail_at.drivers.DriverWaiter;
 
 public class DraftsPage extends AbstractPage {
 
@@ -17,8 +16,8 @@ public class DraftsPage extends AbstractPage {
     @FindBy(xpath = "//a[contains(@href, '#sent')]")
     private WebElement sentPageLink;
 
-    @FindBy(css = "[translate='no']")
-    private WebElement draftsLabel;
+    @FindBy(xpath = "//*[@translate='no']")
+    private List<WebElement> drafts;
 
     private static final String BLANK_LOCATOR_FOR_TEXT = "//*[@class='bog']/*[contains(text(), '%s')]";
 
@@ -28,14 +27,16 @@ public class DraftsPage extends AbstractPage {
 
     public void clickToTheDraftWith(String draftSubject) {
         String subjectFirstWord = splitStringIntoSeparateWords(draftSubject)[0];
-        DriverWaiter.waitForJSComplete();
-        By draftLocator = By.xpath(String.format(BLANK_LOCATOR_FOR_TEXT, subjectFirstWord));
 
-        WebElement draftLink = DriverWaiter.waitForElementToBeClickableAndReturn(draftLocator);
+        String draftLocator = String.format(BLANK_LOCATOR_FOR_TEXT, subjectFirstWord);
+
+        WebElement draftLink = findElementByXPath(draftLocator);
         click(draftLink, String.format("the draft: '%s'", draftSubject));
     }
 
     public boolean isDraftPageOpen() {
-        return isElementPresent(draftsLabel, "Any draft label");
+        String draftsText = getTextOfVisibleElements(drafts);
+        return draftsText.contains("Чернетка") || draftsText.contains("Draft");
+
     }
 }

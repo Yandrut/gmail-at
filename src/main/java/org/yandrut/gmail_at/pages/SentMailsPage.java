@@ -20,7 +20,7 @@ public class SentMailsPage extends AbstractPage {
 
     public boolean isEmailWithSubjectPresent(String emailSubject) {
         String firstWord = splitStringIntoSeparateWords(emailSubject)[0];
-        WebElement emailTopic = findElementByXpath(String.format(BLANK_LOCATOR_FOR_TEXT, firstWord));
+        WebElement emailTopic = findElementByXPath(String.format(BLANK_LOCATOR_FOR_TEXT, firstWord));
         return getText(emailTopic).equals(emailSubject);
     }
 

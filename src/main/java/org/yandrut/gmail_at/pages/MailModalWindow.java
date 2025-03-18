@@ -1,7 +1,5 @@
 package org.yandrut.gmail_at.pages;
 
-import static org.yandrut.gmail_at.drivers.DriverWaiter.waitForJSComplete;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
@@ -41,14 +39,12 @@ public class MailModalWindow extends AbstractPage {
     }
 
     public void clickOnSendMail() {
-        waitForJSComplete();
+
         click(submitMail, "Submit mail in the modal window");
     }
 
     public void navigateToSentPageLink() {
-        waitForJSComplete();
         click(sentPageLink, "Sent mails page link");
-        waitForJSComplete();
     }
 
     public String getDraftEmailInfo() {

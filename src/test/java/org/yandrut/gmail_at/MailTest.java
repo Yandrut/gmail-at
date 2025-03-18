@@ -29,6 +29,7 @@ public class MailTest extends BaseTest {
         homePage.clickOnWriteNewMail();
         modalWindow.createNewEmail(address, subject, body);
         homePage.openDraftsFolder();
+        assertTrue(draftsPage.isDraftPageOpen());
         draftsPage.clickToTheDraftWith(subject);
         String draftEmailInfo = modalWindow.getDraftEmailInfo();
         assertThat(draftEmailInfo)
