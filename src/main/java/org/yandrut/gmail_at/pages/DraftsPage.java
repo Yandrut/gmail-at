@@ -1,14 +1,11 @@
 package org.yandrut.gmail_at.pages;
 
 import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.yandrut.gmail_at.drivers.DriverWaiter;
 
-@Lazy
-@Component
 public class DraftsPage extends AbstractPage {
 
     @FindBy(xpath = " //*[@id=':67']/div[1]/span")
@@ -25,8 +22,8 @@ public class DraftsPage extends AbstractPage {
 
     private static final String BLANK_LOCATOR_FOR_TEXT = "//*[@class='bog']/*[contains(text(), '%s')]";
 
-    public DraftsPage() {
-        super();
+    public DraftsPage(WebDriver driver) {
+        super(driver);
     }
 
     public void clickToTheDraftWith(String draftSubject) {

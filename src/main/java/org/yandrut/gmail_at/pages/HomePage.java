@@ -1,16 +1,12 @@
 package org.yandrut.gmail_at.pages;
 
 import java.util.List;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 import org.yandrut.gmail_at.exception.ElementNotPresentException;
 import org.yandrut.gmail_at.model.User;
 
-@Lazy
-@Component
 public class HomePage extends AbstractPage {
 
     @FindBy(css = "#identifierId")
@@ -37,9 +33,8 @@ public class HomePage extends AbstractPage {
     @FindBy(xpath = "//tr[@draggable='false']")
     private List<WebElement> inboxMail;
 
-    @Autowired
-    public HomePage() {
-        super();
+    public HomePage(WebDriver driver) {
+        super(driver);
     }
 
     public void loginToMailServiceAs(User user) {

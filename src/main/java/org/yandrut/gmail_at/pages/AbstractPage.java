@@ -1,28 +1,22 @@
 package org.yandrut.gmail_at.pages;
 
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
+import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
+import org.yandrut.gmail_at.drivers.DriverProvider;
 import org.yandrut.gmail_at.drivers.DriverWaiter;
 
-@Lazy
-@Component
-@Slf4j
 public abstract class AbstractPage {
 
-    @Autowired
-    protected WebDriver driver;
+    private static final Logger log = LogManager.getLogger(AbstractPage.class);
 
-    @PostConstruct
-    public void initPageFactory() {
-        PageFactory.initElements(driver, this);
+    public AbstractPage(WebDriver driver) {
+        PageFactory.initElements(new AjaxElementLocatorFactory(driver, 10), this);
     }
 
     public void click(WebElement element, String logInfo) {
@@ -37,15 +31,18 @@ public abstract class AbstractPage {
                 log.debug("Error occurred when attempting to click: {}", e.getMessage());
             }
         }
+        DriverWaiter.waitForPageUpdate();
     }
 
     public void sendKeys(WebElement element, String sequence) {
+        DriverWaiter.waitForPageUpdate();
         DriverWaiter.waitForElementToBeVisible(element);
         log.info("Sending key sequence: {}", sequence);
         for (int i = 0; i < 5; i++) {
             try {
                 element.sendKeys(sequence);
                 break;
+
             } catch (WebDriverException e) {
                 log.debug("Error occurred when attempting to send keys: {}", e.getMessage());
             }
@@ -53,18 +50,21 @@ public abstract class AbstractPage {
     }
 
     public String getText(WebElement element) {
+        DriverWaiter.waitForPageUpdate();
         log.info("Retrieving text");
         return element.getText();
     }
 
     public boolean isElementPresent(WebElement element, String logInfo) {
+        DriverWaiter.waitForPageUpdate();
         log.info("Waiting for element to be present: {}", logInfo);
         DriverWaiter.waitForElementToBeVisible(element);
         return element.isDisplayed();
     }
 
     public WebElement findElementByXpath(String xpath) {
-        return driver.findElement(By.xpath(xpath));
+        DriverWaiter.waitForPageUpdate();
+        return DriverProvider.getDriver().findElement(By.xpath(xpath));
     }
 
     public String[] splitStringIntoSeparateWords(String string) {

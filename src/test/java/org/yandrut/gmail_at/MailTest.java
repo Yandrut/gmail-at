@@ -5,19 +5,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.junit.jupiter.api.Test;
 
-@SpringBootTest
 public class MailTest extends BaseTest {
 
     @Order(1)
     @DisplayName("Successful user login")
     @Test
     public void isUserLoggedIn() {
-        boolean isUserLoggedIn = mailServicePage.isUserLoggedIn();
+        boolean isUserLoggedIn = homePage.isUserLoggedIn();
         assertThat(isUserLoggedIn)
             .describedAs("User should be logged in to the mail service")
             .isTrue();
@@ -28,9 +26,9 @@ public class MailTest extends BaseTest {
     @MethodSource(value = "mailData")
     @ParameterizedTest
     public void allowsToCreateNewMailAsDraft(String address, String subject, String body) {
-        mailServicePage.clickOnWriteNewMail();
+        homePage.clickOnWriteNewMail();
         modalWindow.createNewEmail(address, subject, body);
-        mailServicePage.openDraftsFolder();
+        homePage.openDraftsFolder();
         draftsPage.clickToTheDraftWith(subject);
         String draftEmailInfo = modalWindow.getDraftEmailInfo();
         assertThat(draftEmailInfo)
@@ -43,7 +41,7 @@ public class MailTest extends BaseTest {
     @MethodSource(value = "mailSubjects")
     @ParameterizedTest
     public void isMailPresentInTheSentPage(String subject) {
-        mailServicePage.openDraftsFolder();
+        homePage.openDraftsFolder();
         assertTrue(draftsPage.isDraftPageOpen());
         draftsPage.clickToTheDraftWith(subject);
         modalWindow.clickOnSendMail();
@@ -61,7 +59,7 @@ public class MailTest extends BaseTest {
     @Test
     public void isMailPresentInTheInboxPage() {
         String subject = "Please help, Im a bot";
-        boolean isMailPresent = mailServicePage.isMailWithSubjectPresent(subject);
+        boolean isMailPresent = homePage.isMailWithSubjectPresent(subject);
         assertThat(isMailPresent)
             .as("Mail with a: " + subject + "subject should be present in the inbox page")
             .isTrue();
