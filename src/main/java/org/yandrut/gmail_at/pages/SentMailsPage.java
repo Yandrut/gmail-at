@@ -6,7 +6,7 @@ import org.openqa.selenium.support.FindBy;
 
 public class SentMailsPage extends AbstractPage {
 
-    @FindBy(xpath = "//a[@href='#inbox']")
+    @FindBy(css = "a[href='#inbox']")
     private WebElement inboxLink;
 
     private static final String BLANK_LOCATOR_FOR_TEXT = "//*[@class='bog']/*[contains(text(), '%s')]";

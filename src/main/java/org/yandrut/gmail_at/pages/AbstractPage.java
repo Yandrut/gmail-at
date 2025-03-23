@@ -11,10 +11,10 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.yandrut.gmail_at.drivers.DriverWaiter;
+import org.yandrut.gmail_at.drivers.VisibleAjaxElementLocatorFactory;
 
 public abstract class AbstractPage {
 
@@ -24,7 +24,7 @@ public abstract class AbstractPage {
     private final int TIMEOUT_SECONDS = 10;
 
     public AbstractPage(WebDriver driver) {
-        PageFactory.initElements(new AjaxElementLocatorFactory(driver, TIMEOUT_SECONDS), this);
+        PageFactory.initElements(new VisibleAjaxElementLocatorFactory(driver, TIMEOUT_SECONDS), this);
         wait = new DriverWaiter(driver);
         this.driver = driver;
     }
@@ -45,11 +45,12 @@ public abstract class AbstractPage {
     }
 
     public void sendKeys(WebElement element, String sequence) {
-        wait.waitForPageUpdate();
-        wait.waitForElementToBeVisible(element);
+
         log.info("Sending key sequence: {}", sequence);
         for (int i = 0; i < 5; i++) {
             try {
+                wait.waitForPageUpdate();
+                wait.waitForElementToBeVisible(element);
                 element.sendKeys(sequence);
                 break;
             } catch (StaleElementReferenceException e) {
@@ -101,7 +102,7 @@ public abstract class AbstractPage {
                 .until(ExpectedConditions.visibilityOfElementLocated(By.xpath(locator)));
             return driver.findElement(By.xpath(locator));
         } catch (NoSuchElementException exception) {
-            log.debug("Unable to find element: ", locator);
+            log.debug("Unable to find element: {} ", locator);
             throw exception;
         } finally {
             log.debug(driver.getCurrentUrl());

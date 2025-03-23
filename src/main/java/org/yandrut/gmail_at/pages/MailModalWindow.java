@@ -9,7 +9,7 @@ public class MailModalWindow extends AbstractPage {
     @FindBy(xpath = "//div[@aria-multiselectable='true']/div/input[@role='combobox']")
     private WebElement addressInput;
 
-    @FindBy(xpath = "//input[@spellcheck='true']")
+    @FindBy(css = "[spellcheck='true']")
     private WebElement subjectInput;
 
     @FindBy(css = "[g_editable='true']")

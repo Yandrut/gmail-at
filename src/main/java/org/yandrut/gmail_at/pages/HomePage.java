@@ -25,14 +25,16 @@ public class HomePage extends AbstractPage {
     @FindBy(xpath = "//img[contains(@src, 'logo_gmail_lockup')]")
     private WebElement gmailLogo;
 
-    private static final Logger log = LogManager.getLogger(HomePage.class);
-
     @FindBy(xpath = "//div[@role='navigation']//div[@role='button']")
     private WebElement writeNewMail;
+
     @FindBy(xpath = "//*[contains(@href, '#draft')]")
     private WebElement draftFolderLink;
+
     @FindBy(xpath = "//*[@class='bog']/span")
     private List<WebElement> inboxMail;
+
+    private static final Logger log = LogManager.getLogger(HomePage.class);
 
     public HomePage(WebDriver driver) {
         super(driver);

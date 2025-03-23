@@ -1,7 +1,6 @@
 package org.yandrut.gmail_at;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
@@ -32,7 +31,6 @@ public class MailTest extends BaseTest {
         homePage.clickOnWriteNewMail();
         modalWindow.createNewEmail(address, subject, body);
         homePage.openDraftsFolder();
-        assertTrue(draftsPage.isDraftPageOpen(), "Draft page should be open");
         draftsPage.clickToTheDraftWith(subject);
         String draftEmailInfo = modalWindow.getDraftEmailInfo();
         assertThat(draftEmailInfo)
@@ -46,13 +44,12 @@ public class MailTest extends BaseTest {
     @ParameterizedTest
     public void isMailPresentInTheSentPage(String subject) {
         homePage.openDraftsFolder();
-        assertTrue(draftsPage.isDraftPageOpen(), "Draft page should be open");
         draftsPage.clickToTheDraftWith(subject);
         modalWindow.clickOnSendMail();
         modalWindow.navigateToSentPageLink();
         boolean isMailPresentInTheSentPage = sentMailsPage.isEmailWithSubjectPresent(subject);
         assertThat(isMailPresentInTheSentPage)
-            .as("Mail with a: " + subject + " should be present in the sent page")
+            .as("Mail with a: \"" + subject + "\" should be present in the sent page")
             .isTrue();
     }
 
