@@ -7,10 +7,13 @@ import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Execution(ExecutionMode.SAME_THREAD)
 public class MailTest extends BaseTest {
 
     @Order(1)
@@ -58,10 +61,10 @@ public class MailTest extends BaseTest {
     @Test
     public void isMailPresentInTheInboxPage() {
         String subject = "Please help, I'm a bot";
-        String allMailsFromInbox = homePage.getAllMailsFromInbox();
-        assertThat(allMailsFromInbox)
-            .as("Mail with a: " + subject + " subject should be present in the inbox page")
-            .contains(subject);
+        boolean isMailPresent = homePage.isEmailWithASubjectPresent(subject);
+        assertThat(isMailPresent)
+            .as("Mail with a: \"" + subject + "\" subject should be present in the inbox page")
+            .isTrue();
     }
 
     public static Object[][] mailData() {

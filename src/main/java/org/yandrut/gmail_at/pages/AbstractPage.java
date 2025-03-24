@@ -1,112 +1,107 @@
 package org.yandrut.gmail_at.pages;
 
-import java.time.Duration;
-import java.util.List;
+import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
+import static com.codeborne.selenide.Condition.clickable;
+import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.not;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$x;
+
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.WebDriverRunner;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.yandrut.gmail_at.drivers.DriverWaiter;
-import org.yandrut.gmail_at.drivers.VisibleAjaxElementLocatorFactory;
+import org.openqa.selenium.interactions.Actions;
 
 public abstract class AbstractPage {
 
     private static final Logger log = LogManager.getLogger(AbstractPage.class);
-    private final DriverWaiter wait;
-    private final WebDriver driver;
-    private final int TIMEOUT_SECONDS = 10;
 
-    public AbstractPage(WebDriver driver) {
-        PageFactory.initElements(new VisibleAjaxElementLocatorFactory(driver, TIMEOUT_SECONDS), this);
-        wait = new DriverWaiter(driver);
-        this.driver = driver;
+    private static SelenideElement highlightElement(SelenideElement element) {
+        return element.shouldBe(visible, enabled).highlight();
     }
 
-    public void click(WebElement element, String logInfo) {
-        wait.waitForElementToBeVisible(element);
-        wait.waitForElementToBeClickable(element);
+    public void click(SelenideElement element, String logInfo) {
+
         for (int i = 0; i < 10; i++) {
             try {
                 log.info("Trying to click on: {} ", logInfo);
-                element.click();
+                highlightElement(element)
+                    .shouldBe(clickable)
+                    .click();
                 break;
-            } catch (WebDriverException e) {
-                log.debug("Error occurred when attempting to click: {}", e.getMessage());
+            } catch (NoSuchElementException e) {
+                log.debug("Error occurred while clicking {}", e.getMessage());
             }
         }
-        wait.waitForPageUpdate();
     }
 
-    public void sendKeys(WebElement element, String sequence) {
-
-        log.info("Sending key sequence: {}", sequence);
-        for (int i = 0; i < 5; i++) {
+    public void sendKeys(SelenideElement element, String sequence) {
+        for (int i = 0; i < 10; i++) {
             try {
-                wait.waitForPageUpdate();
-                wait.waitForElementToBeVisible(element);
-                element.sendKeys(sequence);
+                log.info("Sending key sequence: {}", sequence);
+                highlightElement(element)
+                    .setValue(sequence);
                 break;
-            } catch (StaleElementReferenceException e) {
-                log.debug("Error occurred when attempting to send keys: {}", e.getMessage());
-                driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(TIMEOUT_SECONDS));
+            } catch (NoSuchElementException e) {
+                log.debug("Error occurred while sending keys: {}", e.getMessage());
             }
         }
     }
 
-    public String getText(WebElement element) {
-        wait.waitForPageUpdate();
-        wait.waitForJSComplete();
-        log.info("Retrieving text");
-        return element.getText();
+    public void clickUsingActions(SelenideElement element) {
+        highlightElement(element);
+        WebElement webElement = element.toWebElement();
+        new Actions(WebDriverRunner.getWebDriver())
+            .moveToElement(webElement)
+            .click()
+            .perform();
     }
 
-    public boolean isElementPresent(WebElement element, String logInfo) {
-        wait.waitForPageUpdate();
-        wait.waitForJSComplete();
+    public void sendKeysUsingActions(SelenideElement element, String sequence) {
+        highlightElement(element);
+        new Actions(WebDriverRunner.getWebDriver())
+            .moveToElement(element.toWebElement())
+            .click()
+            .sendKeys(sequence)
+            .perform();
+    }
+
+    public String getText(SelenideElement element) {
+        return highlightElement(element).getText();
+    }
+
+    public SelenideElement findElementByXPath(String locator) {
+        return highlightElement($x(locator));
+    }
+
+    public String getTextOfAllElements(ElementsCollection collection) {
+        collection.shouldBe(sizeGreaterThan(0));
+        String visibleMails = collection.stream()
+                                        .filter(SelenideElement::isDisplayed)
+                                        .map(SelenideElement::getText)
+                                        .reduce((a, b) -> a + "; " + b)
+                                        .orElse("");
+        log.debug("Elements found on the page: {}", visibleMails);
+        return visibleMails;
+    }
+
+    public void waitForElementNotVisible(SelenideElement element) {
+        element.shouldBe(not(visible));
+    }
+
+    public boolean isElementPresent(SelenideElement element, String logInfo) {
+        highlightElement(element);
         log.info("Waiting for element to be present: {}", logInfo);
-        try {
-            wait.waitForElementToBeVisible(element);
-        } catch (StaleElementReferenceException e) {
-            log.debug("Error occurred while waiting: {} ", e.getMessage());
-        }
-        return element.isDisplayed();
+        return element.isDisplayed() && element.isEnabled();
     }
 
-    public String getTextOfVisibleElements(List<WebElement> elements) {
-        wait.waitForPageUpdate();
-        wait.waitForJSComplete();
-        String delimiter = "; ";
-        StringBuilder s = new StringBuilder();
-        for (WebElement element : elements) {
-            if (isElementPresent(element, "inbox email")) {
-                s.append(element.getText()).append(delimiter);
-            } else {
-                wait.waitForElementToBeVisible(element);
-                s.append(element.getText()).append(delimiter);
-            }
-        }
-        return s.toString();
-    }
-
-    public WebElement findElementByXPath(String locator) {
-        wait.waitForJSComplete();
-        try {
-            new WebDriverWait(driver, Duration.ofSeconds(TIMEOUT_SECONDS))
-                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath(locator)));
-            return driver.findElement(By.xpath(locator));
-        } catch (NoSuchElementException exception) {
-            log.debug("Unable to find element: {} ", locator);
-            throw exception;
-        } finally {
-            log.debug(driver.getCurrentUrl());
-        }
+    public void elementShouldHaveText(SelenideElement element, String text) {
+        element.shouldHave(text(text));
     }
 
     public String[] splitStringIntoSeparateWords(String string) {
