@@ -1,84 +1,107 @@
 package org.yandrut.gmail_at.pages;
 
-import static org.yandrut.gmail_at.drivers.DriverWaiter.waitForJSComplete;
+import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
+import static com.codeborne.selenide.Condition.clickable;
+import static com.codeborne.selenide.Condition.enabled;
+import static com.codeborne.selenide.Condition.not;
+import static com.codeborne.selenide.Condition.text;
+import static com.codeborne.selenide.Condition.visible;
+import static com.codeborne.selenide.Selenide.$x;
 
-import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.StaleElementReferenceException;
-import org.openqa.selenium.WebDriver;
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+import com.codeborne.selenide.WebDriverRunner;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
-import org.openqa.selenium.support.PageFactory;
-import org.yandrut.gmail_at.drivers.DriverWaiter;
+import org.openqa.selenium.interactions.Actions;
 
-@Lazy
-@Component
-@Slf4j
 public abstract class AbstractPage {
 
-    @Autowired
-    protected WebDriver driver;
+    private static final Logger log = LogManager.getLogger(AbstractPage.class);
 
-    @PostConstruct
-    public void initPageFactory() {
-        PageFactory.initElements(driver, this);
+    private static SelenideElement highlightElement(SelenideElement element) {
+        return element.shouldBe(visible, enabled).highlight();
     }
 
-    public void click(WebElement element, String logInfo) {
-        DriverWaiter.waitForElementToBeVisible(element);
-        DriverWaiter.waitForElementToBeClickable(element);
-        for (int i = 0; i < 5; i++) {
+    public void click(SelenideElement element, String logInfo) {
+
+        for (int i = 0; i < 10; i++) {
             try {
-                log.info("Clicking on: {} ", logInfo);
-                element.click();
+                log.info("Trying to click on: {} ", logInfo);
+                highlightElement(element)
+                    .shouldBe(clickable)
+                    .click();
                 break;
-            } catch (StaleElementReferenceException e) {
-                log.debug("Click failed, trying again. Message: {}", e.getMessage());
+            } catch (NoSuchElementException e) {
+                log.debug("Error occurred while clicking {}", e.getMessage());
             }
         }
     }
 
-    public void clickByJs(WebElement element, String logInfo) {
-        DriverWaiter.waitForElementToBeVisible(element);
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        log.info("Clicking by JS on: {} ", logInfo);
-        js.executeScript("arguments[0].click();", element);
+    public void sendKeys(SelenideElement element, String sequence) {
+        for (int i = 0; i < 10; i++) {
+            try {
+                log.info("Sending key sequence: {}", sequence);
+                highlightElement(element)
+                    .setValue(sequence);
+                break;
+            } catch (NoSuchElementException e) {
+                log.debug("Error occurred while sending keys: {}", e.getMessage());
+            }
+        }
     }
 
-
-    public void sendKeys(WebElement element, String sequence) {
-        DriverWaiter.waitForElementToBeVisible(element);
-        log.info("Sending key sequence: {}", sequence);
-        element.sendKeys(sequence);
+    public void clickUsingActions(SelenideElement element) {
+        highlightElement(element);
+        WebElement webElement = element.toWebElement();
+        new Actions(WebDriverRunner.getWebDriver())
+            .moveToElement(webElement)
+            .click()
+            .perform();
     }
 
-    public String getText(WebElement element) {
-        log.info("Retrieving text");
-        return element.getText();
+    public void sendKeysUsingActions(SelenideElement element, String sequence) {
+        highlightElement(element);
+        new Actions(WebDriverRunner.getWebDriver())
+            .moveToElement(element.toWebElement())
+            .click()
+            .sendKeys(sequence)
+            .perform();
     }
 
-    public boolean isElementPresent(WebElement element, String logInfo) {
+    public String getText(SelenideElement element) {
+        return highlightElement(element).getText();
+    }
+
+    public SelenideElement findElementByXPath(String locator) {
+        return highlightElement($x(locator));
+    }
+
+    public String getTextOfAllElements(ElementsCollection collection) {
+        collection.shouldBe(sizeGreaterThan(0));
+        String visibleMails = collection.stream()
+                                        .filter(SelenideElement::isDisplayed)
+                                        .map(SelenideElement::getText)
+                                        .reduce((a, b) -> a + "; " + b)
+                                        .orElse("");
+        log.debug("Elements found on the page: {}", visibleMails);
+        return visibleMails;
+    }
+
+    public void waitForElementNotVisible(SelenideElement element) {
+        element.shouldBe(not(visible));
+    }
+
+    public boolean isElementPresent(SelenideElement element, String logInfo) {
+        highlightElement(element);
         log.info("Waiting for element to be present: {}", logInfo);
-        DriverWaiter.waitForElementToBeVisible(element);
-        return element.isDisplayed();
+        return element.isDisplayed() && element.isEnabled();
     }
 
-    public WebElement findElementByXpath(String xpath) {
-        return driver.findElement(By.xpath(xpath));
-    }
-
-    public void waitForAttributeToBe(WebElement element, String attribute, String expectedValue) {
-        DriverWaiter.waitForAttributeToBe(element, attribute, expectedValue);
-    }
-
-    public void refreshPage() {
-        waitForJSComplete();
-        driver.navigate().refresh();
-        waitForJSComplete();
+    public void elementShouldHaveText(SelenideElement element, String text) {
+        element.shouldHave(text(text));
     }
 
     public String[] splitStringIntoSeparateWords(String string) {

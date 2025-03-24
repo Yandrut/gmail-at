@@ -1,46 +1,30 @@
 package org.yandrut.gmail_at.pages;
 
-import static org.yandrut.gmail_at.drivers.DriverWaiter.waitForJSComplete;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$x;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
+import com.codeborne.selenide.SelenideElement;
 
-@Lazy
-@Component
 public class MailModalWindow extends AbstractPage {
 
-    @FindBy(xpath = "//div[@role='presentation']/input[1]")
-    private WebElement addressInput;
-
-    @FindBy(xpath = "//input[@spellcheck='true']")
-    private WebElement subjectInput;
-
-    @FindBy(xpath = "//table[@cellpadding='0']/tbody/tr/td/div/h2/div/following::div/span")
-    private WebElement subjectLabel;
-
-    @FindBy(css = "[g_editable='true']")
-    private WebElement emailBodyInput;
-
-    @FindBy(xpath = "//td/img[3]")
-    private WebElement quitEditing;
-
-    @FindBy(xpath = "//div[contains(@aria-label, 'Enter')]")
-    private WebElement submitMail;
-
-    @FindBy(xpath = "//*[contains(@href, '#sent')]")
-    private WebElement sentPageLink;
+    private static final SelenideElement addressInput = $("input[autocapitalize='off'][role='combobox']");
+    private static final SelenideElement subjectInput = $("[spellcheck='true']");
+    private static final SelenideElement emailBodyInput = $("div[role='textbox']");
+    private static final SelenideElement quitEditing = $("td:has([data-tooltip-delay='800']) img:nth-of-type(3)");
+    private static final SelenideElement submitMail = $x("//*[contains(@aria-label, 'Enter')]");
+    private static final SelenideElement subjectLabel = $x("//div[@style='position: absolute;']//h2//span");
+    private static final SelenideElement sentPageLink = $x("//*[contains(@*, '#sent')]");
 
     public void createNewEmail(String address, String subject, String body) {
         sendKeys(addressInput, address);
         sendKeys(subjectInput, subject);
-        sendKeys(emailBodyInput, body);
-        click(quitEditing, "Exit editing");
+        sendKeysUsingActions(emailBodyInput, body);
+        elementShouldHaveText(subjectLabel, subject);
+        clickUsingActions(quitEditing);
+        waitForElementNotVisible(quitEditing);
     }
 
     public void clickOnSendMail() {
-        waitForJSComplete();
         click(submitMail, "Submit mail in the modal window");
     }
 

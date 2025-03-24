@@ -1,7 +1,5 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '3.4.3'
-	id 'io.spring.dependency-management' version '1.1.7'
 }
 
 group = 'org.yandrut'
@@ -13,27 +11,23 @@ java {
 	}
 }
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
 repositories {
 	mavenCentral()
 }
 
 dependencies {
-
-	implementation 'org.springframework.boot:spring-boot-starter'
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.0.0'
+	testImplementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.12.1'
 	implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: '4.27.0'
 	testImplementation group: 'io.qameta.allure', name: 'allure-junit5', version: '2.28.1'
+	implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.24.3'
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.4'
+	testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.11.4'
+	testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
+	implementation("com.codeborne:selenide:7.7.3")
+	implementation("io.qameta.allure:allure-selenide:2.29.1")
 }
 
-tasks.named('test') {
+test {
 	useJUnitPlatform()
 }
