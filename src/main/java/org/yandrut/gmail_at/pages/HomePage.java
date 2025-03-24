@@ -1,68 +1,59 @@
 package org.yandrut.gmail_at.pages;
 
-import java.util.List;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.FindBy;
-import org.yandrut.gmail_at.driver.waits.DriverWaiter;
-import org.yandrut.gmail_at.element.Button;
-import org.yandrut.gmail_at.element.Image;
-import org.yandrut.gmail_at.element.InputField;
-import org.yandrut.gmail_at.element.Label;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Selenide.$x;
+
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+import java.util.Arrays;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.openqa.selenium.By;
 import org.yandrut.gmail_at.model.User;
 
 public class HomePage extends AbstractPage {
 
-    @FindBy(css = "#identifierId")
-    private InputField emailField;
+    private static final SelenideElement emailField = $("#identifierId");
+    private static final SelenideElement submitEmail = $x("//div[@id='identifierNext']//button");
+    private static final SelenideElement passwordField = $("[type='password']");
+    private static final SelenideElement submitPassword = $x("//div[@id='passwordNext']//button");
+    private static final SelenideElement gmailLogo = $x("//a[@title='Gmail']/img");
+    private static final SelenideElement writeNewMail = $x("//div[@role='navigation']//div[@role='button']");
+    private static final SelenideElement draftFolderLink = $x("//*[contains(@href, '#draft')]");
+    private static final ElementsCollection inboxMail =
+        $$(By.xpath("//tr[@draggable='false']//div[@role='link']/div/div/span/span"));
 
-    @FindBy(xpath = "//div[@id='identifierNext']//button")
-    private Button submitEmail;
-
-    @FindBy(css = "[type='password']")
-    private InputField passwordField;
-
-    @FindBy(css = "div#passwordNext button")
-    private Button submitPassword;
-
-    @FindBy(css = "a[title='Gmail'] > img")
-    private Image gmailLogo;
-
-    @FindBy(xpath = "//*[contains(@href, '#draft')]")
-    private Button draftFolderLink;
-
-    @FindBy(css = "div[role='navigation'] div[role='button']")
-    private Button writeNewMail;
-
-    @FindBy(css = "tr[draggable='false'] div[role='link'] div > div > span > span")
-    private List<Label> inboxMail;
-
-    public HomePage(WebDriver driver) {
-        super(driver);
-    }
+    private static final Logger log = LogManager.getLogger(HomePage.class);
 
     public void loginToMailServiceAs(User user) {
-        emailField.sendKeys(user.email());
-        submitEmail.click("Submit email button");
-        passwordField.sendKeys(user.password());
-        submitPassword.click("Submit password button");
+        sendKeys(emailField, user.getEmail());
+        click(submitEmail, "Submit email button");
+        sendKeysUsingActions(passwordField, user.getPassword());
+        click(submitPassword, "Submit password button");
     }
 
     public boolean isUserLoggedIn() {
-        return gmailLogo.isImagePresent("Gmail logo on the mail page");
+        return isElementPresent(gmailLogo, "Gmail logo");
     }
 
     public void clickOnWriteNewMail() {
-        writeNewMail.click("Write new mail button");
+        writeNewMail.click();
     }
 
     public void openDraftsFolder() {
-        draftFolderLink.click("Draft folder link");
+        click(draftFolderLink, "Draft folder link");
     }
 
-    public List<String> getAllMails() {
-        DriverWaiter.waitForListOfElementsToBePresent(inboxMail);
-        return inboxMail.stream()
-                        .map(Label::getText)
-                        .toList();
+    public boolean isEmailWithASubjectPresent(String subject) {
+        return Arrays.stream(getAllMailsFromInbox()
+                         .split(";"))
+                     .anyMatch(s -> s.contains(subject));
+    }
+
+    private String getAllMailsFromInbox() {
+        String visibleMails = getTextOfAllElements(inboxMail);
+        log.debug("Mails found on the page: {}", visibleMails);
+        return visibleMails;
     }
 }

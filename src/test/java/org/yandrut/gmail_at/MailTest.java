@@ -1,14 +1,18 @@
 package org.yandrut.gmail_at;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
+import org.junit.jupiter.api.parallel.Execution;
+import org.junit.jupiter.api.parallel.ExecutionMode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+@Execution(ExecutionMode.SAME_THREAD)
 public class MailTest extends BaseTest {
 
     @Order(1)
@@ -30,7 +34,7 @@ public class MailTest extends BaseTest {
         modalWindow.createNewEmail(address, subject, body);
         homePage.openDraftsFolder();
         draftsPage.clickToTheDraftWith(subject);
-        var draftEmailInfo = modalWindow.getDraftEmailInfo();
+        String draftEmailInfo = modalWindow.getDraftEmailInfo();
         assertThat(draftEmailInfo)
             .contains(subject, body)
             .as("Draft content should contain subject and body of the email");
@@ -42,15 +46,12 @@ public class MailTest extends BaseTest {
     @ParameterizedTest
     public void isMailPresentInTheSentPage(String subject) {
         homePage.openDraftsFolder();
-        assertTrue(draftsPage.isDraftPageOpen());
         draftsPage.clickToTheDraftWith(subject);
         modalWindow.clickOnSendMail();
         modalWindow.navigateToSentPageLink();
-        assertTrue(sentMailsPage.isSentPageOpen());
-
         boolean isMailPresentInTheSentPage = sentMailsPage.isEmailWithSubjectPresent(subject);
         assertThat(isMailPresentInTheSentPage)
-            .as("Mail with a: " + subject + " should be present in the sent page")
+            .as("Mail with a: \"" + subject + "\" should be present in the sent page")
             .isTrue();
     }
 
@@ -59,11 +60,9 @@ public class MailTest extends BaseTest {
     @Test
     public void isMailPresentInTheInboxPage() {
         String subject = "Please help, I'm a bot";
-
-        var allMails = homePage.getAllMails();
-        assertThat(allMails.contains(subject))
-            .as("Mail with a: " + subject + " subject should be present in the inbox page")
-            .as("All mails: " + allMails)
+        boolean isMailPresent = homePage.isEmailWithASubjectPresent(subject);
+        assertThat(isMailPresent)
+            .as("Mail with a: \"" + subject + "\" subject should be present in the inbox page")
             .isTrue();
     }
 

@@ -1,8 +1,11 @@
 package org.yandrut.gmail_at;
 
+import static com.codeborne.selenide.Selenide.closeWebDriver;
+import static com.codeborne.selenide.Selenide.open;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.yandrut.gmail_at.driver.DriverProvider;
+import org.yandrut.gmail_at.configuration.SelenideConfiguration;
 import org.yandrut.gmail_at.model.User;
 import org.yandrut.gmail_at.pages.DraftsPage;
 import org.yandrut.gmail_at.pages.HomePage;
@@ -12,29 +15,25 @@ import org.yandrut.gmail_at.utils.DataReader;
 
 public class BaseTest {
 
-    String BASE_URL = DataReader.getData("test.url");
+    String BASE_URL = DataReader.getData("base.url");
     String EMAIL = System.getenv("AT_GOOGLE_MAIL");
     String PASSWORD = System.getenv("AT_GOOGLE_PASSWORD");
 
-    HomePage homePage;
-    MailModalWindow modalWindow;
-    DraftsPage draftsPage;
-    SentMailsPage sentMailsPage;
+    HomePage homePage = new HomePage();
+    MailModalWindow modalWindow = new MailModalWindow();
+    DraftsPage draftsPage = new DraftsPage();
+    SentMailsPage sentMailsPage = new SentMailsPage();
 
     @BeforeEach
     public void setup() {
-        var driver = DriverProvider.getDriver();
-        driver.get(BASE_URL);
-        var user = new User(EMAIL, PASSWORD);
-        homePage = new HomePage(driver);
+        SelenideConfiguration.configureSelenide();
+        open(BASE_URL);
+        User user = new User(EMAIL, PASSWORD);
         homePage.loginToMailServiceAs(user);
-        modalWindow = new MailModalWindow(driver);
-        draftsPage = new DraftsPage(driver);
-        sentMailsPage = new SentMailsPage(driver);
     }
 
     @AfterEach
     public void closeBrowser() {
-        DriverProvider.quit();
+        closeWebDriver();
     }
 }
