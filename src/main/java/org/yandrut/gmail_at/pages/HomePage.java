@@ -1,66 +1,58 @@
 package org.yandrut.gmail_at.pages;
 
-import java.util.List;
+import static com.codeborne.selenide.Selenide.$;
+import static com.codeborne.selenide.Selenide.$$;
+import static com.codeborne.selenide.Selenide.$x;
+
+import com.codeborne.selenide.ElementsCollection;
+import com.codeborne.selenide.SelenideElement;
+import java.util.Arrays;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.By;
 import org.yandrut.gmail_at.model.User;
 
 public class HomePage extends AbstractPage {
 
-    @FindBy(css = "#identifierId")
-    private WebElement emailField;
-
-    @FindBy(xpath = "//div[@id='identifierNext']//button")
-    private WebElement nextAfterEmail;
-
-    @FindBy(css = "[type='password']")
-    private WebElement passwordField;
-
-    @FindBy(xpath = "//div[@id='passwordNext']//button")
-    private WebElement nextAfterPassword;
-
-    @FindBy(xpath = "//img[contains(@src, 'logo_gmail_lockup')]")
-    private WebElement gmailLogo;
-
-    @FindBy(xpath = "//div[@role='navigation']//div[@role='button']")
-    private WebElement writeNewMail;
-
-    @FindBy(xpath = "//*[contains(@href, '#draft')]")
-    private WebElement draftFolderLink;
-
-    @FindBy(xpath = "//*[@class='bog']/span")
-    private List<WebElement> inboxMail;
+    private static final SelenideElement emailField = $("#identifierId");
+    private static final SelenideElement submitEmail = $x("//div[@id='identifierNext']//button");
+    private static final SelenideElement passwordField = $("[type='password']");
+    private static final SelenideElement submitPassword = $x("//div[@id='passwordNext']//button");
+    private static final SelenideElement gmailLogo = $x("//a[@title='Gmail']/img");
+    private static final SelenideElement writeNewMail = $x("//div[@role='navigation']//div[@role='button']");
+    private static final SelenideElement draftFolderLink = $x("//*[contains(@href, '#draft')]");
+    private static final ElementsCollection inboxMail =
+        $$(By.xpath("//tr[@draggable='false']//div[@role='link']/div/div/span/span"));
 
     private static final Logger log = LogManager.getLogger(HomePage.class);
 
-    public HomePage(WebDriver driver) {
-        super(driver);
-    }
-
     public void loginToMailServiceAs(User user) {
         sendKeys(emailField, user.getEmail());
-        click(nextAfterEmail, "Submit email button");
-        sendKeys(passwordField, user.getPassword());
-        click(nextAfterPassword, "Submit password button");
+        click(submitEmail, "Submit email button");
+        sendKeysUsingActions(passwordField, user.getPassword());
+        click(submitPassword, "Submit password button");
     }
 
     public boolean isUserLoggedIn() {
-        return isElementPresent(gmailLogo, "Gmail logo on the mail page");
+        return isElementPresent(gmailLogo, "Gmail logo");
     }
 
     public void clickOnWriteNewMail() {
-        click(writeNewMail, "Write new mail button");
+        writeNewMail.click();
     }
 
     public void openDraftsFolder() {
         click(draftFolderLink, "Draft folder link");
     }
 
-    public String getAllMailsFromInbox() {
-        String visibleMails = getTextOfVisibleElements(inboxMail);
+    public boolean isEmailWithASubjectPresent(String subject) {
+        return Arrays.stream(getAllMailsFromInbox()
+                         .split(";"))
+                     .anyMatch(s -> s.contains(subject));
+    }
+
+    private String getAllMailsFromInbox() {
+        String visibleMails = getTextOfAllElements(inboxMail);
         log.debug("Mails found on the page: {}", visibleMails);
         return visibleMails;
     }

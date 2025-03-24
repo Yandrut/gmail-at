@@ -1,4 +1,4 @@
-package org.yandrut.gmail_at.drivers.utils;
+package org.yandrut.gmail_at.utils;
 
 import java.util.ResourceBundle;
 
