@@ -1,4 +1,4 @@
-package org.yandrut.gmail_at.drivers.manager;
+package org.yandrut.gmail_at.driver.manager;
 
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;

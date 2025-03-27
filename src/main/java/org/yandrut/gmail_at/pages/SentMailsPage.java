@@ -1,26 +1,21 @@
 package org.yandrut.gmail_at.pages;
 
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
+import static org.yandrut.gmail_at.utils.StringUtils.splitStringIntoSeparateWords;
 
-@Lazy
-@Component
+import org.openqa.selenium.WebDriver;
+import org.yandrut.gmail_at.element.Label;
+
 public class SentMailsPage extends AbstractPage {
-
-    @FindBy(xpath = "//a[@href='#inbox']")
-    private WebElement inboxLink;
 
     private static final String BLANK_LOCATOR_FOR_TEXT = "//*[@class='bog']/*[contains(text(), '%s')]";
 
-    public boolean isEmailWithSubjectPresent(String emailSubject) {
-        String firstWord = splitStringIntoSeparateWords(emailSubject)[0];
-        WebElement emailTopic = findElementByXpath(String.format(BLANK_LOCATOR_FOR_TEXT, firstWord));
-        return getText(emailTopic).equals(emailSubject);
+    public SentMailsPage(WebDriver driver) {
+        super(driver);
     }
 
-    public void moveToHome() {
-        click(inboxLink, "inbox link");
+    public boolean isEmailWithSubjectPresent(String emailSubject) {
+        var firstWord = splitStringIntoSeparateWords(emailSubject)[0];
+        var emailTopic = Label.findElementByXpath(String.format(BLANK_LOCATOR_FOR_TEXT, firstWord));
+        return emailTopic.getText().equals(emailSubject);
     }
 }

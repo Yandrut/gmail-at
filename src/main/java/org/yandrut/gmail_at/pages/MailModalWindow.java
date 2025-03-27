@@ -1,54 +1,59 @@
 package org.yandrut.gmail_at.pages;
 
-import static org.yandrut.gmail_at.drivers.DriverWaiter.waitForJSComplete;
+import static org.yandrut.gmail_at.driver.waits.DriverWaiter.waitForJSComplete;
 
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.FindBy;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
+import org.yandrut.gmail_at.element.Button;
+import org.yandrut.gmail_at.element.InputField;
+import org.yandrut.gmail_at.element.Label;
 
-@Lazy
-@Component
 public class MailModalWindow extends AbstractPage {
 
-    @FindBy(xpath = "//div[@role='presentation']/input[1]")
-    private WebElement addressInput;
+    @FindBy(css = "input[autocapitalize='off'][role='combobox']")
+    private InputField addressInput;
 
-    @FindBy(xpath = "//input[@spellcheck='true']")
-    private WebElement subjectInput;
+    @FindBy(css = "[spellcheck='true']")
+    private InputField subjectInput;
 
-    @FindBy(xpath = "//table[@cellpadding='0']/tbody/tr/td/div/h2/div/following::div/span")
-    private WebElement subjectLabel;
+    @FindBy(css = "div[role='textbox']")
+    private InputField emailBodyInput;
 
-    @FindBy(css = "[g_editable='true']")
-    private WebElement emailBodyInput;
+    @FindBy(css = "td:has([data-tooltip-delay='800']) img:nth-of-type(3)")
+    private Button quitEditing;
 
-    @FindBy(xpath = "//td/img[3]")
-    private WebElement quitEditing;
+    @FindBy(xpath = "//*[contains(@aria-label, 'Enter')]")
+    private Button submitMail;
 
-    @FindBy(xpath = "//div[contains(@aria-label, 'Enter')]")
-    private WebElement submitMail;
+    @FindBy(css = "div[style='position: absolute;'] h2 span")
+    private Label subjectLabel;
 
-    @FindBy(xpath = "//*[contains(@href, '#sent')]")
-    private WebElement sentPageLink;
+    @FindBy(xpath = "//*[contains(@*, '#sent')]")
+    private Button sentPageLink;
+
+    public MailModalWindow(WebDriver driver) {
+        super(driver);
+    }
 
     public void createNewEmail(String address, String subject, String body) {
-        sendKeys(addressInput, address);
-        sendKeys(subjectInput, subject);
-        sendKeys(emailBodyInput, body);
-        click(quitEditing, "Exit editing");
+        addressInput.sendKeys(address);
+        subjectInput.sendKeys(subject);
+        emailBodyInput.sendKeys(body);
+        quitEditing.click("Exit editing");
     }
 
     public void clickOnSendMail() {
         waitForJSComplete();
-        click(submitMail, "Submit mail in the modal window");
+        submitMail.click("Submit mail in the modal window");
     }
 
     public void navigateToSentPageLink() {
-        click(sentPageLink, "Sent mails page link");
+        waitForJSComplete();
+        sentPageLink.click("Sent mails page link");
+        waitForJSComplete();
     }
 
     public String getDraftEmailInfo() {
-        return getText(subjectLabel) + "; " + getText(emailBodyInput);
+        return subjectLabel.getText() + "; " + emailBodyInput.getText();
     }
 }

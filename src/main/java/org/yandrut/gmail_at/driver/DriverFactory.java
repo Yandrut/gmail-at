@@ -1,8 +1,8 @@
-package org.yandrut.gmail_at.drivers;
+package org.yandrut.gmail_at.driver;
 
 import org.openqa.selenium.WebDriver;
-import org.yandrut.gmail_at.drivers.manager.ChromeManager;
-import org.yandrut.gmail_at.drivers.manager.FirefoxManager;
+import org.yandrut.gmail_at.driver.manager.ChromeManager;
+import org.yandrut.gmail_at.driver.manager.FirefoxManager;
 import org.yandrut.gmail_at.exception.DriverNotSupportedException;
 
 public final class DriverFactory {

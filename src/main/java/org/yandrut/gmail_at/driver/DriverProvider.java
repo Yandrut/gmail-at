@@ -1,4 +1,4 @@
-package org.yandrut.gmail_at.drivers;
+package org.yandrut.gmail_at.driver;
 
 import java.util.Objects;
 import org.openqa.selenium.WebDriver;
