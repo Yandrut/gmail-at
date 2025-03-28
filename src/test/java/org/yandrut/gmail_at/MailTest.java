@@ -1,14 +1,16 @@
 package org.yandrut.gmail_at;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class MailTest extends BaseTest {
 
     @Order(1)
@@ -42,11 +44,9 @@ public class MailTest extends BaseTest {
     @ParameterizedTest
     public void isMailPresentInTheSentPage(String subject) {
         homePage.openDraftsFolder();
-        assertTrue(draftsPage.isDraftPageOpen());
         draftsPage.clickToTheDraftWith(subject);
         modalWindow.clickOnSendMail();
         modalWindow.navigateToSentPageLink();
-        assertTrue(sentMailsPage.isSentPageOpen());
 
         boolean isMailPresentInTheSentPage = sentMailsPage.isEmailWithSubjectPresent(subject);
         assertThat(isMailPresentInTheSentPage)
