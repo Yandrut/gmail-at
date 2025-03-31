@@ -17,9 +17,6 @@ import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
-@Lazy
-@Component
-@Slf4j
 public abstract class AbstractPage {
 
     private static final Logger log = LogManager.getLogger(AbstractPage.class);
