@@ -6,7 +6,7 @@ import org.yandrut.gmail_at.configuration.manager.FirefoxManager;
 import org.yandrut.gmail_at.exception.DriverNotSupportedException;
 
 public class SelenideConfiguration {
-    private static final String BROWSER_TYPE = System.getProperty("browser", "chrome");
+    private static final String BROWSER_TYPE = System.getenv("browser");
 
     private SelenideConfiguration() {
     }
