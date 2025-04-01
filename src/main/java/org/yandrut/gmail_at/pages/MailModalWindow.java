@@ -12,7 +12,7 @@ public class MailModalWindow extends AbstractPage {
     private static final SelenideElement emailBodyInput = $("div[role='textbox']");
     private static final SelenideElement quitEditing = $("td:has([data-tooltip-delay='800']) img:nth-of-type(3)");
     private static final SelenideElement submitMail = $x("//*[contains(@aria-label, 'Enter')]");
-    private static final SelenideElement subjectLabel = $x("//div[@style='position: absolute;']//h2//span");
+    private static final SelenideElement subjectLabel = $("div[style='position: absolute;'] h2 span");
     private static final SelenideElement sentPageLink = $x("//*[contains(@*, '#sent')]");
 
     public void createNewEmail(String address, String subject, String body) {

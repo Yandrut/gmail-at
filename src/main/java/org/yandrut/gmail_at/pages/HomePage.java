@@ -22,7 +22,7 @@ public class HomePage extends AbstractPage {
     private static final SelenideElement writeNewMail = $x("//div[@role='navigation']//div[@role='button']");
     private static final SelenideElement draftFolderLink = $x("//*[contains(@href, '#draft')]");
     private static final ElementsCollection inboxMail =
-        $$(By.xpath("//tr[@draggable='false']//div[@role='link']/div/div/span/span"));
+        $$(By.xpath("//span[@class='bog']/span"));
 
     private static final Logger log = LogManager.getLogger(HomePage.class);
 
