@@ -1,4 +1,4 @@
-Task for using Selenoid API with any mail service, with few simple scenarios
+Task for using Selenide API with any mail service, with few simple scenarios
 
 **Task description:**
 ![img.png](readmeContent/img_4.png)
