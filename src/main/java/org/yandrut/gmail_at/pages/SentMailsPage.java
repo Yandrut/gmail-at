@@ -1,6 +1,8 @@
 package org.yandrut.gmail_at.pages;
 
-import com.codeborne.selenide.Condition;
+import static com.codeborne.selenide.Selenide.$$x;
+
+import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
 public class SentMailsPage extends AbstractPage {
@@ -9,7 +11,9 @@ public class SentMailsPage extends AbstractPage {
 
     public boolean isEmailWithSubjectPresent(String emailSubject) {
         String firstWord = splitStringIntoSeparateWords(emailSubject)[0];
-        SelenideElement emailTopic = findElementByXPath(String.format(BLANK_LOCATOR_FOR_TEXT, firstWord));
-        return emailTopic.shouldBe(Condition.visible).getText().equals(emailSubject);
+        String locator = String.format(BLANK_LOCATOR_FOR_TEXT, firstWord);
+        ElementsCollection emailTopics = $$x(locator);
+        SelenideElement wantedElement = getElementWithTextFromCollection(emailTopics, emailSubject);
+        return wantedElement.getText().equals(emailSubject);
     }
 }
