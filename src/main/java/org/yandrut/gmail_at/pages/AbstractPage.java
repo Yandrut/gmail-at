@@ -1,13 +1,12 @@
 package org.yandrut.gmail_at.pages;
 
-import static com.codeborne.selenide.CollectionCondition.sizeGreaterThan;
 import static com.codeborne.selenide.Condition.clickable;
 import static com.codeborne.selenide.Condition.enabled;
 import static com.codeborne.selenide.Condition.not;
 import static com.codeborne.selenide.Condition.text;
 import static com.codeborne.selenide.Condition.visible;
-import static com.codeborne.selenide.Selenide.$x;
 
+import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 import com.codeborne.selenide.WebDriverRunner;
@@ -75,14 +74,23 @@ public abstract class AbstractPage {
         return highlightElement(element).getText();
     }
 
-    public SelenideElement findElementByXPath(String locator) {
-        return highlightElement($x(locator));
+    private void sizeGreaterThanZero(ElementsCollection elements) {
+        elements.shouldBe(CollectionCondition.sizeGreaterThan(0));
+    }
+
+    public SelenideElement getElementWithTextFromCollection(ElementsCollection collection, String text) {
+        sizeGreaterThanZero(collection);
+        SelenideElement wantedElement = collection.findBy(text(text)).shouldBe(visible, clickable);
+        highlightElement(wantedElement);
+        return wantedElement;
     }
 
     public String getTextOfAllElements(ElementsCollection collection) {
-        collection.shouldBe(sizeGreaterThan(0));
+        sizeGreaterThanZero(collection);
+
         String visibleMails = collection.stream()
                                         .filter(SelenideElement::isDisplayed)
+                                        .map(SelenideElement::highlight)
                                         .map(SelenideElement::getText)
                                         .reduce((a, b) -> a + "; " + b)
                                         .orElse("");
